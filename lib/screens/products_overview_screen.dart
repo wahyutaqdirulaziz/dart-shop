@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../providers/products.dart';
 import '../widgets/products_grid.dart';
 
 enum FilterOptions {
@@ -9,27 +7,34 @@ enum FilterOptions {
   all,
 }
 
-class ProductsOverviewScreen extends StatelessWidget {
+class ProductsOverviewScreen extends StatefulWidget {
+  @override
+  _ProductsOverviewScreenState createState() => _ProductsOverviewScreenState();
+}
+
+class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
+  var _showOnlyFavorites = false;
+
   @override
   Widget build(BuildContext context) {
-    final productsProvider = Provider.of<Products>(context, listen: false);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dart Shop'),
         actions: [
           PopupMenuButton(
             onSelected: (FilterOptions selectedValue) {
-              switch (selectedValue) {
-                case FilterOptions.favorites:
-                  productsProvider.showFavoritesOnly();
-                  break;
-                case FilterOptions.all:
-                  productsProvider.showAll();
-                  break;
-                default:
-                  throw ErrorDescription('Unknown action');
-              }
+              setState(() {
+                switch (selectedValue) {
+                  case FilterOptions.favorites:
+                    _showOnlyFavorites = true;
+                    break;
+                  case FilterOptions.all:
+                    _showOnlyFavorites = false;
+                    break;
+                  default:
+                    throw ErrorDescription('Unknown action');
+                }
+              });
             },
             icon: const Icon(Icons.more_vert),
             itemBuilder: (_) {
@@ -47,7 +52,7 @@ class ProductsOverviewScreen extends StatelessWidget {
           )
         ],
       ),
-      body: ProductsGrid(),
+      body: ProductsGrid(showFavs: _showOnlyFavorites),
     );
   }
 }
