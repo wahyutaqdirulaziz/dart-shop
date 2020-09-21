@@ -28,7 +28,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           Consumer<Cart>(
             builder: (_, cartProvider, iconButtonWidget) {
               return Badge(
-                value: cartProvider.itemCount.toString(),
+                value: cartProvider.cartCount.toString(),
                 iconButtonWidget: iconButtonWidget,
               );
             },
@@ -68,7 +68,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           ),
         ],
       ),
-      body: ProductsGrid(showFavs: _showOnlyFavorites),
+      body: ProductsGrid(showOnlyFavorites: _showOnlyFavorites),
     );
   }
 }

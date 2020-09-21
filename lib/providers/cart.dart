@@ -10,7 +10,7 @@ class CartItem {
   final double price;
   final int quantity;
 
-  CartItem({
+  const CartItem({
     @required this.id,
     @required this.title,
     @required this.price,
@@ -19,23 +19,27 @@ class CartItem {
 }
 
 class Cart with ChangeNotifier {
-  final Map<String, CartItem> _items = {};
+  final Map<String, CartItem> _carts = {};
 
-  Map<String, CartItem> get items => {..._items};
+  Map<String, CartItem> get carts => {..._carts};
 
-  int get itemCount => _items.length;
+  List<String> get cartIds => _carts.keys.toList();
+
+  List<CartItem> get cartItems => _carts.values.toList();
+
+  int get cartCount => _carts.length;
 
   double get totalAmount {
     var total = 0.0;
-    _items.forEach((key, cartItem) {
+    _carts.forEach((key, cartItem) {
       total += cartItem.price * cartItem.quantity;
     });
     return total;
   }
 
-  void addItem({String productId, String title, double price}) {
-    if (_items.containsKey(productId)) {
-      _items.update(productId, (existingCartItem) {
+  void addCart({String productId, String title, double price}) {
+    if (_carts.containsKey(productId)) {
+      _carts.update(productId, (existingCartItem) {
         return CartItem(
           id: existingCartItem.id,
           title: existingCartItem.title,
@@ -44,7 +48,7 @@ class Cart with ChangeNotifier {
         );
       });
     } else {
-      _items.putIfAbsent(productId, () {
+      _carts.putIfAbsent(productId, () {
         return CartItem(
           id: uuid.v4(),
           title: title,
@@ -53,6 +57,11 @@ class Cart with ChangeNotifier {
         );
       });
     }
+    notifyListeners();
+  }
+
+  void removeCart(String productId) {
+    _carts.remove(productId);
     notifyListeners();
   }
 }
