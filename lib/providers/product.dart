@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-
 import 'package:uuid/uuid.dart';
 
 final uuid = Uuid();

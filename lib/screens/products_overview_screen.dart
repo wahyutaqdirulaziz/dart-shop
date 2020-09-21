@@ -5,6 +5,7 @@ import '../providers/cart.dart';
 import '../widgets/badge.dart';
 import '../widgets/products_grid.dart';
 import 'cart_screen.dart';
+import '../widgets/app_drawer.dart';
 
 enum FilterOptions {
   favorites,
@@ -12,6 +13,8 @@ enum FilterOptions {
 }
 
 class ProductsOverviewScreen extends StatefulWidget {
+  static const routeName = '/';
+
   @override
   _ProductsOverviewScreenState createState() => _ProductsOverviewScreenState();
 }
@@ -28,7 +31,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           Consumer<Cart>(
             builder: (_, cartProvider, iconButtonWidget) {
               return Badge(
-                value: cartProvider.cartCount.toString(),
+                value: cartProvider.cartsCount.toString(),
                 iconButtonWidget: iconButtonWidget,
               );
             },
@@ -68,6 +71,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           ),
         ],
       ),
+      drawer: AppDrawer(),
       body: ProductsGrid(showOnlyFavorites: _showOnlyFavorites),
     );
   }

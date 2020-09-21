@@ -22,10 +22,10 @@ class CartItem extends StatelessWidget {
 
     return Dismissible(
       key: ValueKey(cartId),
-      direction: DismissDirection.endToStart,
+      direction: DismissDirection.startToEnd,
       background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.only(left: 20),
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
         color: Theme.of(context).errorColor,
         child: const Icon(

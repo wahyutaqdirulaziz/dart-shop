@@ -31,11 +31,13 @@ class ProductItem extends StatelessWidget {
             splashRadius: 50,
             icon: const Icon(Icons.shopping_cart),
             color: Theme.of(context).accentColor,
-            onPressed: () => cartProvider.addCart(
-              productId: product.id,
-              title: product.title,
-              price: product.price,
-            ),
+            onPressed: () {
+              cartProvider.addCart(
+                product.id,
+                product.title,
+                product.price,
+              );
+            },
           ),
         ),
         child: GestureDetector(

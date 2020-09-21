@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-
 import 'package:uuid/uuid.dart';
 
 final uuid = Uuid();
@@ -27,9 +26,9 @@ class Cart with ChangeNotifier {
 
   List<CartItem> get cartItems => _carts.values.toList();
 
-  int get cartCount => _carts.length;
+  int get cartsCount => _carts.length;
 
-  double get totalAmount {
+  double get totalPrice {
     var total = 0.0;
     _carts.forEach((key, cartItem) {
       total += cartItem.price * cartItem.quantity;
@@ -37,7 +36,7 @@ class Cart with ChangeNotifier {
     return total;
   }
 
-  void addCart({String productId, String title, double price}) {
+  void addCart(String productId, String title, double price) {
     if (_carts.containsKey(productId)) {
       _carts.update(productId, (existingCartItem) {
         return CartItem(
@@ -62,6 +61,11 @@ class Cart with ChangeNotifier {
 
   void removeCart(String productId) {
     _carts.remove(productId);
+    notifyListeners();
+  }
+
+  void clear() {
+    _carts.clear();
     notifyListeners();
   }
 }
