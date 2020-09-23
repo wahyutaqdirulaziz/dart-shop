@@ -38,7 +38,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           builder: (_) {
             return const ErrorDialog(
               title: 'An Error Occurred!',
-              content: 'Something went wrong!',
+              content: 'Fetching products failed!',
             );
           },
         );
@@ -97,13 +97,30 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+      body: Builder(
+        builder: (context) {
+          final scaffold = Scaffold.of(context);
+          return RefreshIndicator(
+            onRefresh: () async {
+              try {
+                await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+              } catch (_) {
+                scaffold.hideCurrentSnackBar();
+                scaffold.showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Fetching products failed!',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+            },
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ProductsGrid(showOnlyFavorites: _showOnlyFavorites),
+          );
         },
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : ProductsGrid(showOnlyFavorites: _showOnlyFavorites),
       ),
     );
   }

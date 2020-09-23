@@ -84,7 +84,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
         _editedProduct.description = _inputs['description'];
         _editedProduct.price = double.parse(_inputs['price']);
         _editedProduct.imageUrl = _inputs['imageUrl'];
-        Provider.of<Products>(context, listen: false).updateProduct(_editedProduct);
+        await Provider.of<Products>(context, listen: false).updateProduct(_editedProduct);
       } else {
         _editedProduct = Product(
           id: 'TEMP',
