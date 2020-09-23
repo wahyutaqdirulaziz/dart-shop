@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/product.dart';
+import '../providers/products.dart';
 
-class EditProductScreen extends StatefulWidget {
+class AddEditProductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
 
   @override
-  _EditProductScreenState createState() => _EditProductScreenState();
+  _AddEditProductScreenState createState() => _AddEditProductScreenState();
 }
 
-class _EditProductScreenState extends State<EditProductScreen> {
+class _AddEditProductScreenState extends State<AddEditProductScreen> {
+  var _isEditing = false;
+
   final _priceFocusNode = FocusNode();
   final _descriptionFocusNode = FocusNode();
   final _imageUrlFocusNode = FocusNode();
@@ -17,11 +21,26 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   final _form = GlobalKey<FormState>();
   final _inputs = <String, String>{};
+  Product _editedProduct;
 
   @override
   void initState() {
     super.initState();
     _imageUrlFocusNode.addListener(_updateImageUrl);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final productId = ModalRoute.of(context).settings.arguments as String;
+    if (productId != null) {
+      _isEditing = true;
+      _editedProduct = Provider.of<Products>(context, listen: false).findById(productId);
+      _inputs['title'] = _editedProduct.title;
+      _inputs['description'] = _editedProduct.description;
+      _inputs['price'] = _editedProduct.price.toString();
+      _imageUrlController.text = _editedProduct.imageUrl;
+    }
   }
 
   @override
@@ -36,12 +55,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
-      if (_imageUrlController.text.isEmpty ||
-          (!_imageUrlController.text.startsWith('http') &&
-              !_imageUrlController.text.startsWith('https')) ||
-          (!_imageUrlController.text.endsWith('.png') &&
-              !_imageUrlController.text.endsWith('.jpg') &&
-              !_imageUrlController.text.endsWith('.jpeg'))) {
+      if (_imageUrlController.text.isEmpty) {
+        return;
+      } else if (!_imageUrlController.text.startsWith('http') &&
+          !_imageUrlController.text.startsWith('https')) {
+        return;
+      } else if (!_imageUrlController.text.endsWith('.png') &&
+          !_imageUrlController.text.endsWith('.jpg') &&
+          !_imageUrlController.text.endsWith('.jpeg')) {
         return;
       }
       setState(() {});
@@ -53,17 +74,24 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (!isValid) return;
 
     _form.currentState.save();
-    final _editedProduct = Product(
-      title: _inputs['title'],
-      description: _inputs['description'],
-      price: double.parse(_inputs['price']),
-      imageUrl: _inputs['imageUrl'],
-    );
 
-    print(_editedProduct.title);
-    print(_editedProduct.description);
-    print(_editedProduct.price);
-    print(_editedProduct.imageUrl);
+    if (_isEditing) {
+      _editedProduct.title = _inputs['title'];
+      _editedProduct.description = _inputs['description'];
+      _editedProduct.price = double.parse(_inputs['price']);
+      _editedProduct.imageUrl = _inputs['imageUrl'];
+      Provider.of<Products>(context, listen: false).updateProduct(_editedProduct);
+    } else {
+      _editedProduct = Product(
+        title: _inputs['title'],
+        description: _inputs['description'],
+        price: double.parse(_inputs['price']),
+        imageUrl: _inputs['imageUrl'],
+      );
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
+
+    Navigator.of(context).pop();
   }
 
   @override
@@ -86,6 +114,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             child: Column(
               children: [
                 TextFormField(
+                  initialValue: _inputs['title'],
                   decoration: const InputDecoration(labelText: 'Text'),
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) {
@@ -97,6 +126,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   onSaved: (value) => _inputs['title'] = value,
                 ),
                 TextFormField(
+                  initialValue: _inputs['price'],
                   decoration: const InputDecoration(labelText: 'Price'),
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.number,
@@ -118,6 +148,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   onSaved: (value) => _inputs['price'] = value,
                 ),
                 TextFormField(
+                  initialValue: _inputs['description'],
                   decoration: const InputDecoration(labelText: 'Description'),
                   maxLines: 3,
                   keyboardType: TextInputType.multiline,
