@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/product.dart';
 import '../providers/products.dart';
+import '../widgets/error_dialog.dart';
 
 class AddEditProductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
@@ -86,6 +87,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
         Provider.of<Products>(context, listen: false).updateProduct(_editedProduct);
       } else {
         _editedProduct = Product(
+          id: 'TEMP',
           title: _inputs['title'],
           description: _inputs['description'],
           price: double.parse(_inputs['price']),
@@ -96,16 +98,10 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
     } catch (error) {
       await showDialog(
         context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('An Error Occurred!'),
-            content: const Text('Something went wrong!'),
-            actions: [
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Okay'),
-              ),
-            ],
+        builder: (_) {
+          return const ErrorDialog(
+            title: 'An Error Occurred!',
+            content: 'Something went wrong!',
           );
         },
       );

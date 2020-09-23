@@ -1,7 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:uuid/uuid.dart';
-
-final uuid = Uuid();
 
 class Product with ChangeNotifier {
   String id;
@@ -12,12 +9,13 @@ class Product with ChangeNotifier {
   bool isFavorite;
 
   Product({
+    @required this.id,
     @required this.title,
     @required this.description,
     @required this.price,
     @required this.imageUrl,
     this.isFavorite = false,
-  }) : id = uuid.v4();
+  });
 
   void toggleFavoriteStatus() {
     isFavorite = !isFavorite;

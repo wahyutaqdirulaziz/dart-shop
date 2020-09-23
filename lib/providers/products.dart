@@ -6,40 +6,33 @@ import 'package:http/http.dart' as http;
 
 import 'product.dart';
 
-final firebaseDbUrl = DotEnv().env['FIREBASE_DB_URL'];
+final firebaseCollectionUrl = '${DotEnv().env['FIREBASE_DB_URL']}products.json';
 
 class Products with ChangeNotifier {
-  final List<Product> _products = [
-    Product(
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Product(
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Product(
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl: 'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-    ),
-    Product(
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
-  ];
+  List<Product> _products;
 
   List<Product> get products => [..._products];
+
+  Future fetchAndSetProducts() async {
+    final response = await http.get(firebaseCollectionUrl);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+
+    final loadedProducts = <Product>[];
+    body.forEach((productId, productData) {
+      loadedProducts.add(
+        Product(
+          id: productData['id'] as String,
+          title: productData['title'] as String,
+          description: productData['description'] as String,
+          price: productData['price'] as double,
+          imageUrl: productData['imageUrl'] as String,
+          isFavorite: productData['isFavorite'] as bool,
+        ),
+      );
+    });
+    _products = loadedProducts;
+    notifyListeners();
+  }
 
   int get productsCount => _products.length;
 
@@ -53,7 +46,7 @@ class Products with ChangeNotifier {
 
   Future addProduct(Product product) async {
     final response = await http.post(
-      '${firebaseDbUrl}products.json',
+      firebaseCollectionUrl,
       body: jsonEncode({
         'title': product.title,
         'description': product.description,
