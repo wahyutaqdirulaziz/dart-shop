@@ -1,6 +1,6 @@
 # Dart Shop
 
-Simple online shop app built with Flutter SDK
+Online shop app built with Flutter SDK & Firebase Realtime Database
 
 ## Tags in commit history
 
@@ -8,7 +8,7 @@ Simple online shop app built with Flutter SDK
 
 - Module 9 - User input & forms
 
-- Module 10 - HTTP requests
+- Module 10 - HTTP requests (Firebase realtime database)
 
 - Module 11 - User authentication
 

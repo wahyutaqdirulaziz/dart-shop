@@ -1,6 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 import 'product.dart';
+
+final firebaseDbUrl = DotEnv().env['FIREBASE_DB_URL'];
 
 class Products with ChangeNotifier {
   final List<Product> _products = [
@@ -45,7 +51,19 @@ class Products with ChangeNotifier {
     return _products.firstWhere((product) => product.id == id);
   }
 
-  void addProduct(Product product) {
+  Future addProduct(Product product) async {
+    final response = await http.post(
+      '${firebaseDbUrl}products.json',
+      body: jsonEncode({
+        'title': product.title,
+        'description': product.description,
+        'price': product.price,
+        'imageUrl': product.imageUrl,
+        'isFavorite': product.isFavorite,
+      }),
+    );
+    final body = jsonDecode(response.body);
+    product.id = body['name'] as String;
     _products.add(product);
     notifyListeners();
   }
