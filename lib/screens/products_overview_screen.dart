@@ -32,7 +32,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
     Future.delayed(Duration.zero).then((_) async {
       try {
         await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
-      } catch (error) {
+      } catch (_) {
         await showDialog(
           context: context,
           builder: (_) {
@@ -97,9 +97,14 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ProductsGrid(showOnlyFavorites: _showOnlyFavorites),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+        },
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ProductsGrid(showOnlyFavorites: _showOnlyFavorites),
+      ),
     );
   }
 }
