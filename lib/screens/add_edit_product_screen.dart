@@ -87,7 +87,6 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
         await Provider.of<Products>(context, listen: false).updateProduct(_editedProduct);
       } else {
         _editedProduct = Product(
-          id: 'TEMP',
           title: _inputs['title'],
           description: _inputs['description'],
           price: double.parse(_inputs['price']),
@@ -101,7 +100,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
         builder: (_) {
           return const ErrorDialog(
             title: 'An Error Occurred!',
-            content: 'Something went wrong!',
+            content: 'Cannot add/update the product!',
           );
         },
       );

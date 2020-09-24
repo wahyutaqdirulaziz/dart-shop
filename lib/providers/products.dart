@@ -5,12 +5,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import 'product.dart';
-import '../models/http_exception.dart';
 
 final firebaseDbUrl = DotEnv().env['FIREBASE_DB_URL'];
 
 class Products with ChangeNotifier {
-  List<Product> _products;
+  List<Product> _products = [];
 
   List<Product> get products => [..._products];
 
@@ -26,7 +25,7 @@ class Products with ChangeNotifier {
 
   Future fetchAndSetProducts() async {
     final response = await http.get('${firebaseDbUrl}products.json');
-    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final body = jsonDecode(response.body) as Map<String, dynamic> ?? {};
 
     final loadedProducts = <Product>[];
     body.forEach((productId, productData) {
@@ -41,7 +40,7 @@ class Products with ChangeNotifier {
         ),
       );
     });
-    _products = loadedProducts;
+    _products = loadedProducts.reversed.toList();
     notifyListeners();
   }
 
@@ -63,7 +62,7 @@ class Products with ChangeNotifier {
   }
 
   Future updateProduct(Product updatedProduct) async {
-    await http.patch(
+    final response = await http.patch(
       '${firebaseDbUrl}products/${updatedProduct.id}.json',
       body: jsonEncode({
         'title': updatedProduct.title,
@@ -72,6 +71,9 @@ class Products with ChangeNotifier {
         'imageUrl': updatedProduct.imageUrl,
       }),
     );
+    if (response.statusCode >= 400) {
+      throw Exception('Could not update product');
+    }
     final productIndex = _products.indexWhere((product) {
       return product.id == updatedProduct.id;
     });
@@ -91,7 +93,7 @@ class Products with ChangeNotifier {
     if (response.statusCode >= 400) {
       _products.insert(existingProductIndex, existingProduct);
       notifyListeners();
-      throw const HttpException('Could not delete product');
+      throw Exception('Could not delete product');
     } else {
       existingProduct = null;
     }

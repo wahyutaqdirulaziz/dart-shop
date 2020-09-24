@@ -29,22 +29,25 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   void initState() {
     super.initState();
     setState(() => _isLoading = true);
-    Future.delayed(Duration.zero).then((_) async {
-      try {
-        await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
-      } catch (_) {
-        await showDialog(
-          context: context,
-          builder: (_) {
-            return const ErrorDialog(
-              title: 'An Error Occurred!',
-              content: 'Fetching products failed!',
-            );
-          },
-        );
-      }
+    _fetchProducts().then((_) {
       setState(() => _isLoading = false);
     });
+  }
+
+  Future _fetchProducts() async {
+    try {
+      await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+    } catch (_) {
+      await showDialog(
+        context: context,
+        builder: (_) {
+          return const ErrorDialog(
+            title: 'An Error Occurred!',
+            content: 'Fetching products failed!',
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -99,23 +102,8 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
       drawer: AppDrawer(),
       body: Builder(
         builder: (context) {
-          final scaffold = Scaffold.of(context);
           return RefreshIndicator(
-            onRefresh: () async {
-              try {
-                await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
-              } catch (_) {
-                scaffold.hideCurrentSnackBar();
-                scaffold.showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Fetching products failed!',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                );
-              }
-            },
+            onRefresh: _fetchProducts,
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : ProductsGrid(showOnlyFavorites: _showOnlyFavorites),

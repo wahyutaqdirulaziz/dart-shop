@@ -1,4 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+
+final firebaseDbUrl = DotEnv().env['FIREBASE_DB_URL'];
 
 class Product with ChangeNotifier {
   String id;
@@ -9,7 +15,7 @@ class Product with ChangeNotifier {
   bool isFavorite;
 
   Product({
-    @required this.id,
+    this.id,
     @required this.title,
     @required this.description,
     @required this.price,
@@ -17,8 +23,22 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  void toggleFavoriteStatus() {
+  Future toggleFavoriteStatus() async {
+    final oldState = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
+
+    try {
+      final response = await http.patch(
+        '${firebaseDbUrl}products/$id.json',
+        body: json.encode({'isFavorite': isFavorite}),
+      );
+      if (response.statusCode >= 400) {
+        throw Exception('Cannot mark the product as favorite');
+      }
+    } catch (_) {
+      isFavorite = oldState;
+      notifyListeners();
+    }
   }
 }

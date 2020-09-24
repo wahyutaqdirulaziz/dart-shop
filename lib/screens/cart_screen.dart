@@ -34,17 +34,7 @@ class CartScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  FlatButton(
-                    onPressed: () {
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                        cartProvider.cartItems,
-                        cartProvider.totalPrice,
-                      );
-                      cartProvider.clear();
-                    },
-                    textColor: Theme.of(context).primaryColor,
-                    child: const Text('ORDER NOW'),
-                  ),
+                  OrderButton(cartProvider),
                 ],
               ),
             ),
@@ -65,6 +55,50 @@ class CartScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  final Cart cart;
+
+  const OrderButton(this.cart);
+
+  @override
+  _OrderButtonState createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  var _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      onPressed: widget.cart.totalPrice <= 0 || _isLoading
+          ? null
+          : () async {
+              setState(() => _isLoading = true);
+              try {
+                await Provider.of<Orders>(context, listen: false).addOrder(
+                  widget.cart.cartItems,
+                  widget.cart.totalPrice,
+                );
+                widget.cart.clear();
+              } catch (_) {
+                Scaffold.of(context).hideCurrentSnackBar();
+                Scaffold.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Cannot add order!',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+              setState(() => _isLoading = false);
+            },
+      textColor: Theme.of(context).primaryColor,
+      child: _isLoading ? const CircularProgressIndicator() : const Text('ORDER NOW'),
     );
   }
 }
