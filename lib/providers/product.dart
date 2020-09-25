@@ -25,22 +25,23 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  Future<void> toggleFavoriteStatus() async {
+  Future<void> toggleFavoriteStatus(String authToken) async {
     final oldState = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
 
     try {
       final response = await http.patch(
-        '${firebaseDbUrl}products/$id.json',
+        '${firebaseDbUrl}products/$id.json?auth=$authToken',
         body: json.encode({'isFavorite': isFavorite}),
       );
       if (response.statusCode >= 400) {
         throw HttpException('Cannot mark the product as favorite');
       }
-    } catch (_) {
+    } catch (error) {
       isFavorite = oldState;
       notifyListeners();
+      rethrow;
     }
   }
 }

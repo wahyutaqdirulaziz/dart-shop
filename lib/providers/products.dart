@@ -10,7 +10,10 @@ import 'product.dart';
 final firebaseDbUrl = DotEnv().env['FIREBASE_DB_URL'];
 
 class Products with ChangeNotifier {
+  final String _authToken;
   List<Product> _products = [];
+
+  Products(this._authToken, this._products);
 
   List<Product> get products => [..._products];
 
@@ -25,7 +28,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    final response = await http.get('${firebaseDbUrl}products.json');
+    final response = await http.get('${firebaseDbUrl}products.json?auth=$_authToken');
     final body = jsonDecode(response.body) as Map<String, dynamic> ?? {};
 
     final loadedProducts = <Product>[];
@@ -47,7 +50,7 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     final response = await http.post(
-      '${firebaseDbUrl}products.json',
+      '${firebaseDbUrl}products.json?auth=$_authToken',
       body: jsonEncode({
         'title': product.title,
         'description': product.description,
@@ -64,7 +67,7 @@ class Products with ChangeNotifier {
 
   Future<void> updateProduct(Product updatedProduct) async {
     final response = await http.patch(
-      '${firebaseDbUrl}products/${updatedProduct.id}.json',
+      '${firebaseDbUrl}products/${updatedProduct.id}.json?auth=$_authToken',
       body: jsonEncode({
         'title': updatedProduct.title,
         'description': updatedProduct.description,
@@ -90,7 +93,9 @@ class Products with ChangeNotifier {
     _products.removeAt(existingProductIndex);
     notifyListeners();
 
-    final response = await http.delete('${firebaseDbUrl}products/$productId.json');
+    final response = await http.delete(
+      '${firebaseDbUrl}products/$productId.json?auth=$_authToken',
+    );
     if (response.statusCode >= 400) {
       _products.insert(existingProductIndex, existingProduct);
       notifyListeners();

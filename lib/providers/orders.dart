@@ -23,14 +23,17 @@ class OrderItem {
 }
 
 class Orders with ChangeNotifier {
+  final String _authToken;
   List<OrderItem> _orders = [];
+
+  Orders(this._authToken, this._orders);
 
   List<OrderItem> get orders => [..._orders];
 
   int get ordersCount => _orders.length;
 
   Future<void> fetchAndSetOrders() async {
-    final response = await http.get('${firebaseDbUrl}orders.json');
+    final response = await http.get('${firebaseDbUrl}orders.json?auth=$_authToken');
     final body = jsonDecode(response.body) as Map<String, dynamic> ?? {};
 
     final loadedOrders = <OrderItem>[];
@@ -58,7 +61,7 @@ class Orders with ChangeNotifier {
   Future<void> addOrder(List<CartItem> cartItems, double totalPrice) async {
     final timestamp = DateTime.now();
     final response = await http.post(
-      '${firebaseDbUrl}orders.json',
+      '${firebaseDbUrl}orders.json?auth=$_authToken',
       body: jsonEncode({
         'totalPrice': totalPrice,
         'dateTime': timestamp.toIso8601String(),

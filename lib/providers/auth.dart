@@ -13,6 +13,16 @@ class Auth with ChangeNotifier {
   DateTime _expiryDate;
   String _userId;
 
+  bool get isAuth => token != null;
+
+  String get token {
+    if (_expiryDate != null && _expiryDate.isAfter(DateTime.now()) && _token != null) {
+      return _token;
+    } else {
+      return null;
+    }
+  }
+
   Future<void> _authenticate(String email, String password, String urlAction) async {
     final response = await http.post(
       'https://identitytoolkit.googleapis.com/v1/accounts:$urlAction?key=$firebaseApiKey',
@@ -27,6 +37,13 @@ class Auth with ChangeNotifier {
     if (responseData['error'] != null) {
       throw HttpException(responseData['error']['message'] as String);
     }
+
+    _token = responseData['idToken'] as String;
+    _userId = responseData['localId'] as String;
+    _expiryDate = DateTime.now().add(
+      Duration(seconds: int.parse(responseData['expiresIn'] as String)),
+    );
+    notifyListeners();
   }
 
   Future<void> signup(String email, String password) {
