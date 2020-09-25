@@ -29,7 +29,7 @@ class Orders with ChangeNotifier {
 
   int get ordersCount => _orders.length;
 
-  Future fetchAndSetOrders() async {
+  Future<void> fetchAndSetOrders() async {
     final response = await http.get('${firebaseDbUrl}orders.json');
     final body = jsonDecode(response.body) as Map<String, dynamic> ?? {};
 
@@ -55,7 +55,7 @@ class Orders with ChangeNotifier {
     notifyListeners();
   }
 
-  Future addOrder(List<CartItem> cartItems, double totalPrice) async {
+  Future<void> addOrder(List<CartItem> cartItems, double totalPrice) async {
     final timestamp = DateTime.now();
     final response = await http.post(
       '${firebaseDbUrl}orders.json',

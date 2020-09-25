@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
+import '../helpers/http_exception.dart';
 import 'product.dart';
 
 final firebaseDbUrl = DotEnv().env['FIREBASE_DB_URL'];
@@ -23,7 +24,7 @@ class Products with ChangeNotifier {
     return _products.firstWhere((product) => product.id == id);
   }
 
-  Future fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts() async {
     final response = await http.get('${firebaseDbUrl}products.json');
     final body = jsonDecode(response.body) as Map<String, dynamic> ?? {};
 
@@ -44,7 +45,7 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  Future addProduct(Product product) async {
+  Future<void> addProduct(Product product) async {
     final response = await http.post(
       '${firebaseDbUrl}products.json',
       body: jsonEncode({
@@ -61,7 +62,7 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  Future updateProduct(Product updatedProduct) async {
+  Future<void> updateProduct(Product updatedProduct) async {
     final response = await http.patch(
       '${firebaseDbUrl}products/${updatedProduct.id}.json',
       body: jsonEncode({
@@ -72,7 +73,7 @@ class Products with ChangeNotifier {
       }),
     );
     if (response.statusCode >= 400) {
-      throw Exception('Could not update product');
+      throw HttpException('Could not update product');
     }
     final productIndex = _products.indexWhere((product) {
       return product.id == updatedProduct.id;
@@ -81,7 +82,7 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  Future deleteProduct(String productId) async {
+  Future<void> deleteProduct(String productId) async {
     final existingProductIndex = _products.indexWhere((product) {
       return product.id == productId;
     });
@@ -93,7 +94,7 @@ class Products with ChangeNotifier {
     if (response.statusCode >= 400) {
       _products.insert(existingProductIndex, existingProduct);
       notifyListeners();
-      throw Exception('Could not delete product');
+      throw HttpException('Could not delete product');
     } else {
       existingProduct = null;
     }
