@@ -10,7 +10,7 @@ Online shop app built with Flutter SDK & Firebase Realtime Database
 
 ## How to run?
 
-1. Create a Firebase project, then create the Realtime Database & connect this app to your Realtime Database (fill the .env)
+1. Create a Firebase project, then create the Realtime Database & connect this app to your Realtime Database (fill the .env). <br>The dummy data is located in *assets/dummy_data/dart-shop-backup.json*
 
 2. Install the dependencies 
 
@@ -26,8 +26,8 @@ $ flutter pub get
 
 - Module 9 - User input & forms
 
-- Module 10 - HTTP requests (Firebase realtime database)
+- Module 10 - HTTP requests (Firebase Realtime Database)
 
-- Module 11 - User authentication
+- Module 11 - User authentication (Firebase Auth REST API)
 
 - Module 12 - Animations

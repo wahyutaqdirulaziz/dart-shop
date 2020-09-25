@@ -11,9 +11,10 @@ final firebaseDbUrl = DotEnv().env['FIREBASE_DB_URL'];
 
 class Products with ChangeNotifier {
   final String _authToken;
+  final String _userId;
   List<Product> _products = [];
 
-  Products(this._authToken, this._products);
+  Products(this._authToken, this._userId, this._products);
 
   List<Product> get products => [..._products];
 
@@ -27,12 +28,17 @@ class Products with ChangeNotifier {
     return _products.firstWhere((product) => product.id == id);
   }
 
-  Future<void> fetchAndSetProducts() async {
-    final response = await http.get('${firebaseDbUrl}products.json?auth=$_authToken');
-    final body = jsonDecode(response.body) as Map<String, dynamic> ?? {};
+  Future<void> fetchAndSetProducts({bool filterByUser = false}) async {
+    final filterParams = filterByUser ? '&orderBy="creatorId"&equalTo="$_userId"' : '';
+    final responses = await Future.wait([
+      http.get('${firebaseDbUrl}products.json?auth=$_authToken$filterParams'),
+      http.get('${firebaseDbUrl}userFavorites/$_userId.json?auth=$_authToken'),
+    ]);
+    final productsBody = jsonDecode(responses[0].body) as Map<String, dynamic> ?? {};
+    final userFavoritesBody = jsonDecode(responses[1].body) as Map<String, dynamic> ?? {};
 
     final loadedProducts = <Product>[];
-    body.forEach((productId, productData) {
+    productsBody.forEach((productId, productData) {
       loadedProducts.add(
         Product(
           id: productId,
@@ -40,7 +46,7 @@ class Products with ChangeNotifier {
           description: productData['description'] as String,
           price: productData['price'] as double,
           imageUrl: productData['imageUrl'] as String,
-          isFavorite: productData['isFavorite'] as bool,
+          isFavorite: userFavoritesBody[productId] as bool ?? false,
         ),
       );
     });
@@ -56,7 +62,7 @@ class Products with ChangeNotifier {
         'description': product.description,
         'price': product.price,
         'imageUrl': product.imageUrl,
-        'isFavorite': product.isFavorite,
+        'creatorId': _userId,
       }),
     );
     final body = jsonDecode(response.body);

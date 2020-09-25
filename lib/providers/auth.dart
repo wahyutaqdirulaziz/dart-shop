@@ -23,6 +23,8 @@ class Auth with ChangeNotifier {
     }
   }
 
+  String get userId => isAuth != null ? _userId : null;
+
   Future<void> _authenticate(String email, String password, String urlAction) async {
     final response = await http.post(
       'https://identitytoolkit.googleapis.com/v1/accounts:$urlAction?key=$firebaseApiKey',

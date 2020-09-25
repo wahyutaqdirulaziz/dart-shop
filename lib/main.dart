@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
           update: (_, auth, previousProducts) {
             return Products(
               auth.token,
+              auth.userId,
               previousProducts == null ? [] : previousProducts.products,
             );
           },
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
           update: (_, auth, previousOrders) {
             return Orders(
               auth.token,
+              auth.userId,
               previousOrders == null ? [] : previousOrders.orders,
             );
           },

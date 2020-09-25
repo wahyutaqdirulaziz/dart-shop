@@ -50,7 +50,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
                       color: Theme.of(context).accentColor,
                       onPressed: () {
-                        product.toggleFavoriteStatus(auth.token).then((_) {
+                        product.toggleFavoriteStatus(auth.token, auth.userId).then((_) {
                           setState(() => _isFavorite = product.isFavorite);
                         }).catchError((_) {
                           Scaffold.of(context).hideCurrentSnackBar();
