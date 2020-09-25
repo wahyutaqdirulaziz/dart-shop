@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
             title: 'Dart Shop',
             theme: ThemeData(
               primarySwatch: Colors.purple,
-              accentColor: Colors.deepOrange,
+              accentColor: Colors.deepOrangeAccent,
               fontFamily: 'Lato',
             ),
             home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
