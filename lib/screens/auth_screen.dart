@@ -97,35 +97,6 @@ class _AuthCardState extends State<AuthCard> with SingleTickerProviderStateMixin
   final _passwordController = TextEditingController();
   final _authData = {'email': '', 'password': ''};
 
-  AnimationController _animationController;
-  Animation<Size> _heightAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-
-    _heightAnimation = Tween<Size>(
-      begin: const Size(double.infinity, 260),
-      end: const Size(double.infinity, 320),
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.linear,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _animationController.dispose();
-  }
-
   void _showErrorDialog(String errorMessage) {
     showDialog(
       context: context,
@@ -182,10 +153,8 @@ class _AuthCardState extends State<AuthCard> with SingleTickerProviderStateMixin
   void _switchAuthMode() {
     if (_authMode == AuthMode.login) {
       setState(() => _authMode = AuthMode.signup);
-      _animationController.forward();
     } else {
       setState(() => _authMode = AuthMode.login);
-      _animationController.reverse();
     }
   }
 
@@ -197,17 +166,13 @@ class _AuthCardState extends State<AuthCard> with SingleTickerProviderStateMixin
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: AnimatedBuilder(
-        animation: _heightAnimation,
-        builder: (_, child) {
-          return Container(
-            height: _heightAnimation.value.height,
-            constraints: BoxConstraints(minHeight: _heightAnimation.value.height),
-            width: deviceSize.width * 0.75,
-            padding: const EdgeInsets.all(16.0),
-            child: child,
-          );
-        },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+        height: _authMode == AuthMode.signup ? 320 : 260,
+        constraints: BoxConstraints(minHeight: _authMode == AuthMode.signup ? 320 : 260),
+        width: deviceSize.width * 0.75,
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
