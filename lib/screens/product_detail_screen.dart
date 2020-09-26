@@ -25,24 +25,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     _isFavorite = product.isFavorite;
 
     return Scaffold(
-      appBar: AppBar(title: Text(product.title)),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(40),
-                bottomRight: Radius.circular(40),
-              ),
-              child: Container(
-                height: 300,
-                width: double.infinity,
-                child: Hero(
+      body: NestedScrollView(
+        headerSliverBuilder: (_, __) {
+          return [
+            SliverAppBar(
+              expandedHeight: 300,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: true,
+                title: Text(product.title),
+                background: Hero(
                   tag: product.id,
                   child: Image.network(product.imageUrl, fit: BoxFit.cover),
                 ),
               ),
             ),
+          ];
+        },
+        body: Column(
+          children: [
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -50,10 +51,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 Builder(
                   builder: (context) {
                     return IconButton(
-                      icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
+                      icon: Icon(
+                        _isFavorite ? Icons.favorite : Icons.favorite_border,
+                      ),
                       color: Theme.of(context).accentColor,
                       onPressed: () {
-                        product.toggleFavoriteStatus(auth.token, auth.userId).then((_) {
+                        product.toggleFavorite(auth.token, auth.userId).then((_) {
                           setState(() => _isFavorite = product.isFavorite);
                         }).catchError((_) {
                           Scaffold.of(context).hideCurrentSnackBar();

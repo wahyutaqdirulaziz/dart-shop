@@ -25,7 +25,7 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  Future<void> toggleFavoriteStatus(String authToken, String userId) async {
+  Future<void> toggleFavorite(String authToken, String userId) async {
     final oldState = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();

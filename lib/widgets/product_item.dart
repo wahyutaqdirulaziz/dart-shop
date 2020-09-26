@@ -25,7 +25,7 @@ class ProductItem extends StatelessWidget {
                 icon: Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border),
                 color: Theme.of(context).accentColor,
                 onPressed: () {
-                  product.toggleFavoriteStatus(auth.token, auth.userId).catchError((_) {
+                  product.toggleFavorite(auth.token, auth.userId).catchError((_) {
                     Scaffold.of(context).hideCurrentSnackBar();
                     Scaffold.of(context).showSnackBar(
                       const SnackBar(
