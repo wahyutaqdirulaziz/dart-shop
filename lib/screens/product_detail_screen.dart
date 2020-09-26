@@ -37,7 +37,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: Container(
                 height: 300,
                 width: double.infinity,
-                child: Image.network(product.imageUrl, fit: BoxFit.cover),
+                child: Hero(
+                  tag: product.id,
+                  child: Image.network(product.imageUrl, fit: BoxFit.cover),
+                ),
               ),
             ),
             const SizedBox(height: 10),
