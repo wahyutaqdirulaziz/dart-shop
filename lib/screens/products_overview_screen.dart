@@ -79,7 +79,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                     _showOnlyFavorites = false;
                     break;
                   default:
-                    throw ErrorDescription('Unknown action');
+                    throw Exception('Unhandled filter action');
                 }
               });
             },

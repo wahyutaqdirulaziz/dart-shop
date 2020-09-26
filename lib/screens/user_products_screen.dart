@@ -93,7 +93,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                       ),
               );
             default:
-              throw Exception('Unknown Future connection state');
+              throw Exception('Unhandled connection state');
           }
         },
       ),

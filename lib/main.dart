@@ -12,6 +12,7 @@ import 'screens/cart_screen.dart';
 import 'screens/orders_screen.dart';
 import 'screens/product_detail_screen.dart';
 import 'screens/products_overview_screen.dart';
+import 'screens/splash_screen.dart';
 import 'screens/user_products_screen.dart';
 
 Future main() async {
@@ -56,7 +57,21 @@ class MyApp extends StatelessWidget {
               accentColor: Colors.deepOrangeAccent,
               fontFamily: 'Lato',
             ),
-            home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+            home: auth.isAuth
+                ? ProductsOverviewScreen()
+                : FutureBuilder(
+                    future: auth.tryAutoLogin(),
+                    builder: (_, snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting:
+                          return SplashScreen();
+                        case ConnectionState.done:
+                          return AuthScreen();
+                        default:
+                          throw Exception('Unhandled connection state');
+                      }
+                    },
+                  ),
             routes: {
               ProductsOverviewScreen.routeName: (_) => ProductsOverviewScreen(),
               ProductDetailScreen.routeName: (_) => ProductDetailScreen(),
